@@ -1,0 +1,22 @@
+{
+  "name": "cordova-auto-reload",
+  "version": "0.0.0",
+  "authors": [
+    "“Sumit <er.sumitarora@gmail.com>"
+  ],
+  "moduleType": [
+    "globals"
+  ],
+  "keywords": [
+    "cordova",
+    "phonegap"
+  ],
+  "license": "MIT",
+  "ignore": [
+    "**/.*",
+    "node_modules",
+    "bower_components",
+    "test",
+    "tests"
+  ]
+}
