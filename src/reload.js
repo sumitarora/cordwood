@@ -14,20 +14,31 @@ function CordovaAutoReload(versionUrl, javascriptUrl, cssUrl, currentVersion) {
 
   (function init() {
 
+    console.log(localStorage.CURRENT_VERSION);
     if (localStorage.CURRENT_VERSION === undefined) {
       localStorage.CURRENT_VERSION = currentVersion;
+      updatedVersion = currentVersion;
+      fetchUpdatedVersion();
+    } else {
+      checkIfVersionChanged();
     }
-    checkIfVersionChanged();
   })();
 
   function checkIfVersionChanged() {
     console.log('checking version change', versionUrl);
-    $.ajax({
-      type: "GET",
-      url: versionUrl + '?' + (new Date()).getTime(),
-      success: onVersionSuccess,
-      error: onServerError
-    });
+    var xhr = new XMLHttpRequest();
+    xhr.open('GET', (versionUrl + '?' + (new Date()).getTime()), true);
+    xhr.responseType = 'json';
+
+    xhr.onreadystatechange = function(e) {
+      if (this.status == 200) {
+        onVersionSuccess(this.response);
+      } else {
+        onServerError('Error fetching version');
+      }
+    };
+
+    xhr.send();
   }
 
   function onVersionSuccess(data) {
@@ -50,6 +61,7 @@ function CordovaAutoReload(versionUrl, javascriptUrl, cssUrl, currentVersion) {
 
   function errorWhileDownloading(error) {
     console.log(error);
+    loadFilesAndInitializeApp();
   };
 
   function fetchUpdatedVersion() {
@@ -62,27 +74,20 @@ function CordovaAutoReload(versionUrl, javascriptUrl, cssUrl, currentVersion) {
 
   function onServerError(e) {
     console.log(e);
-    loadFilesAndInitializeApp();
+    fetchUpdatedVersion();
   }
 
   //------------------------------------------------ Read and Load Files ----------------------------------------------//
 
-  function loadFilesAndInitializeApp() {
-    window.resolveLocalFileSystemURL(cordova.file.dataDirectory + localStorage.CURRENT_VERSION + "_" + JS_FILE_NAME, readFile, fileReadError);
-    window.resolveLocalFileSystemURL(cordova.file.dataDirectory + localStorage.CURRENT_VERSION + "_" + CSS_FILE_NAME, readFile, fileReadError);
-  }
-
-  function fileReadError(e) {
-    console.log(e);
-    fetchUpdatedVersion();
-  }
-
-  function readFile(fileEntry) {
-    console.log(fileEntry.nativeURL);
-    if (checkIfJsFile(fileEntry.nativeURL)) {
-      loadjscssfile(fileEntry.nativeURL, "js");
-    } else {
-      loadjscssfile(fileEntry.nativeURL, "css");
+  function allFilesRead(files) {
+    console.log('files', files);
+    for (var i = 0; i < files.length; i++) {
+      var fileEntry = files[i].fileEntry;
+      if (checkIfJsFile(fileEntry.nativeURL)) {
+        loadjscssfile(fileEntry.nativeURL, "js");
+      } else {
+        loadjscssfile(fileEntry.nativeURL, "css");
+      }
     }
 
     setTimeout(function() {
@@ -90,10 +95,22 @@ function CordovaAutoReload(versionUrl, javascriptUrl, cssUrl, currentVersion) {
         angular.bootstrap(document, ['starter']);
       });
     }, 500);
-  }
 
-  function onError(e) {
-    console.log(e);
+  };
+
+  function errorReadingFiles(error) {
+    console.log(error);
+    fetchUpdatedVersion();
+  };
+
+  function loadFilesAndInitializeApp() {
+    if (localStorage.CURRENT_VERSION !== undefined) {
+      var files = [localStorage.CURRENT_VERSION + "_" + JS_FILE_NAME, localStorage.CURRENT_VERSION + "_" + CSS_FILE_NAME];
+      var r = new ReadService(allFilesRead, errorReadingFiles);
+      r.readUrls(files);
+    } else {
+      fetchUpdatedVersion();
+    }
   }
 
   function loadjscssfile(filename, filetype) {
@@ -112,9 +129,75 @@ function CordovaAutoReload(versionUrl, javascriptUrl, cssUrl, currentVersion) {
   }
 
   //------------------------------------------------ Read Service ----------------------------------------------//
+  function ReadService(successCallback, errorCallback) {
+    var readQueue = [];
+    var loadedFiles = [];
+
+    this.readUrls = function(urls) {
+      if (typeof(urls) === "string") {
+        readQueue.push(urls);
+      } else if (typeof(urls) === "object") {
+        readQueue = urls;
+      } else {
+        throw "Url's must be String or Array";
+      }
+      console.log('readQueue:', readQueue);
+      startReading();
+    };
+
+    function startReading() {
+      console.log('start reading');
+      for (var i = 0; i < readQueue.length; i++) {
+        readFile(readQueue[i]);
+      };
+    };
+
+    function checkAllFilesRead() {
+      console.log('check', loadedFiles);
+      if (readQueue.length == loadedFiles.length) {
+        var allRead = true;
+        for (var i = 0; i < loadedFiles.length; i++) {
+          if (!loadedFiles[i].read) {
+            allRead = false;
+            break;
+          }
+        };
+        if (allRead) {
+          successCallback(loadedFiles);
+        } else {
+          errorCallback('Unable to read all files');
+        }
+      }
+    };
+
+    function readFile(filename) {
+
+      console.log(filename);
+      window.resolveLocalFileSystemURL(cordova.file.dataDirectory + filename, readFileSuccess, readFileError);
+
+      function readFileSuccess(fileEntry) {
+        console.log(fileEntry.nativeURL);
+        var obj = {};
+        obj.filename = filename;
+        obj.fileEntry = fileEntry;
+        obj.read = true;
+        loadedFiles.push(obj);
+        checkAllFilesRead();
+      };
+
+      function readFileError(e) {
+        console.log(e);
+        var obj = {};
+        obj.filename = filename;
+        obj.read = false;
+        loadedFiles.push(obj);
+        checkAllFilesRead();
+      };
+    };
+
+
+  };
   //------------------------------------------------ Read Service ----------------------------------------------//
-
-
 
 
   //------------------------------------------------ Download Service ----------------------------------------------//
