@@ -1,8 +1,8 @@
 function CordovaAutoReload(versionUrl, javascriptUrl, cssUrl, currentVersion) {
 
-  var d = new Date();
-  var JS_FILE_NAME = d.getTime() + 'app.js';
-  var CSS_FILE_NAME = d.getTime() + 'app.css';
+  var JS_FILE_NAME = 'app.js';
+  var CSS_FILE_NAME = 'app.css';
+  var updatedVersion;
 
   function checkIfJsFile(filename) {
     return filename.indexOf('.js') > -1;
@@ -10,18 +10,17 @@ function CordovaAutoReload(versionUrl, javascriptUrl, cssUrl, currentVersion) {
 
   //------------------------------------------------ Version Check ----------------------------------------------//
 
-  var updatedVersion;
-
   (function init() {
 
-    console.log(localStorage.CURRENT_VERSION);
     if (localStorage.CURRENT_VERSION === undefined) {
       localStorage.CURRENT_VERSION = currentVersion;
       updatedVersion = currentVersion;
       fetchUpdatedVersion();
     } else {
+      updatedVersion = localStorage.CURRENT_VERSION;
       checkIfVersionChanged();
     }
+
   })();
 
   function checkIfVersionChanged() {
@@ -30,11 +29,14 @@ function CordovaAutoReload(versionUrl, javascriptUrl, cssUrl, currentVersion) {
     xhr.open('GET', (versionUrl + '?' + (new Date()).getTime()), true);
     xhr.responseType = 'json';
 
+    xhr.onerror = function(e) {
+      console.log('unable to check version', e);
+      loadFilesAndInitializeApp();
+    };
+
     xhr.onreadystatechange = function(e) {
-      if (this.status == 200) {
+      if (this.readyState == 4 && this.status == 200) {
         onVersionSuccess(this.response);
-      } else {
-        onServerError('Error fetching version');
       }
     };
 
@@ -42,10 +44,12 @@ function CordovaAutoReload(versionUrl, javascriptUrl, cssUrl, currentVersion) {
   }
 
   function onVersionSuccess(data) {
-    console.log('version from server:', data.version);
+    console.log('version from server:', data);
     console.log('version at local:', localStorage.CURRENT_VERSION);
 
-    updatedVersion = data.version;
+    if (data.version) {
+      updatedVersion = data.version;
+    }
     if (data.version !== localStorage.CURRENT_VERSION) {
       fetchUpdatedVersion();
     } else {
@@ -100,7 +104,7 @@ function CordovaAutoReload(versionUrl, javascriptUrl, cssUrl, currentVersion) {
 
   function errorReadingFiles(error) {
     console.log(error);
-    fetchUpdatedVersion();
+    //fetchUpdatedVersion();
   };
 
   function loadFilesAndInitializeApp() {
@@ -172,6 +176,7 @@ function CordovaAutoReload(versionUrl, javascriptUrl, cssUrl, currentVersion) {
 
     function readFile(filename) {
 
+      console.log(cordova.file.dataDirectory);
       console.log(filename);
       window.resolveLocalFileSystemURL(cordova.file.dataDirectory + filename, readFileSuccess, readFileError);
 
@@ -203,6 +208,7 @@ function CordovaAutoReload(versionUrl, javascriptUrl, cssUrl, currentVersion) {
   //------------------------------------------------ Download Service ----------------------------------------------//
 
   function DownloadService(successCallback, errorCallback) {
+    console.log('version inside download: ', updatedVersion);
 
     var downloadsQueue = [];
     var downloadedQueue = [];
