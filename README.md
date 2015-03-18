@@ -23,7 +23,7 @@ gulp.task('car', function() {
 - bower install https://github.com/rangle/cordova-auto-reload.git
 
 
-- Remove js and css file links from the index.html and include reload.js
+- Remove js and css file links which drive application (basically css and js files in www\css and www\js folders) from the index.html and include reload.js
 ```
 <script src="lib/cordova-auto-reload/src/reload.js"></script>
 ```
