@@ -1,4 +1,11 @@
-function CordovaAutoReload(versionUrl, javascriptUrl, cssUrl, currentVersion) {
+function CordovaAutoReload(options) {
+
+  var versionUrl = options.versionUrl;
+  var javascriptUrl = options.javascriptUrl;
+  var cssUrl = options.cssUrl;
+  var currentVersion = options.currentVersion;
+  var successCallback = options.successCallback;
+  var errorCallback = options.errorCallback;
 
   var JS_FILE_NAME = 'app.js';
   var CSS_FILE_NAME = 'app.css';
@@ -100,17 +107,13 @@ function CordovaAutoReload(versionUrl, javascriptUrl, cssUrl, currentVersion) {
       }
     }
 
-    setTimeout(function() {
-      angular.element(document).ready(function() {
-        angular.bootstrap(document, ['starter']);
-      });
-    }, 500);
+    setTimeout(successCallback, 500);
 
   };
 
   function errorReadingFiles(error) {
     console.log(error);
-    //fetchUpdatedVersion();
+    errorCallback();
   };
 
   function loadFilesAndInitializeApp() {
