@@ -28,6 +28,12 @@ function CordovaAutoReload(versionUrl, javascriptUrl, cssUrl, currentVersion) {
     var xhr = new XMLHttpRequest();
     xhr.open('GET', (versionUrl + '?' + (new Date()).getTime()), true);
     xhr.responseType = 'json';
+    xhr.timeout = 4000;
+
+    xhr.ontimeout = function() {
+      console.log('unable to check version Timed out');
+      loadFilesAndInitializeApp();
+    };
 
     xhr.onerror = function(e) {
       console.log('unable to check version', e);
