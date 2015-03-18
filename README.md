@@ -3,7 +3,7 @@
 - create cordova app
 - run app and test
 - add plugins org.apache.cordova.file-transfer, org.apache.cordova.file
-- npminstall gulp-car plugin
+- npm install gulp-car plugin
 - add build task to gulp file as shown below
 
 ```
