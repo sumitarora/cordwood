@@ -1,8 +1,8 @@
-# cordova-auto-reload
+# Cordwood
 
 - create cordova app
 - run app and test
-- add plugins org.apache.cordova.file-transfer, org.apache.cordova.file
+- add plugins `cordova-plugin-file-transfer`, `cordova-plugin-file`
 - npm install gulp-car plugin
 - add build task to gulp file as shown below
 
@@ -20,12 +20,12 @@ gulp.task('car', function() {
 });
 ```
 
-- bower install https://github.com/rangle/cordova-auto-reload.git
+- bower install https://github.com/rangle/cordwood.git
 
 
-- Remove js and css file links which drive application (basically css and js files in www\css and www\js folders) from the index.html and include reload.js
+- Remove all js and css file links which drive application (including vendor files such as ionic and angular)
 ```
-<script src="lib/cordova-auto-reload/src/reload.js"></script>
+<script src="lib/cordwood/src/cordwood.js"></script>
 ```
 
 - Remove ng-app="starter" from body tag
@@ -55,12 +55,21 @@ document.addEventListener("deviceready", function(){
   options.successCallback = successCallback;
   options.errorCallback = errorCallback;
 
-  var cordovaAutoReload = new CordovaAutoReload(options);
+  Cordwood(options);
 }, false);
 
-</script>    
+</script>
 ```
 
 - Run the app it should run fine.
 
 - If everythings ok try changing the application and change version number and deploy it on server and check app gets updated without reload
+
+
+## Development
+
+1. `gulp scripts` build the browserify bundle
+2. `gulp dev` watch and re-build the browserify bundle
+3. `gulp test` run tests
+4. `gulp tdd` tests with watch
+
