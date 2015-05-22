@@ -34,6 +34,9 @@ version.fetchLatestVersion = function(versionUrl, callback) {
   };
 
   xhr.send();
+
+  // Make the xhr object available to unit tests.
+  return xhr;
 };
 
 version.didUpdate = function() {

@@ -1,9 +1,46 @@
 var bootstrap = require('../src/bootstrap');
+var readService = require('../src/read-service');
 
 describe('Bootstrap', function() {
+  var testJsFileName = 'my-app_v_1.1.1.js';
+  var testCssFileName = 'my-app_v_1.1.1.css';
+
+  var constants = {
+    JS_FILE_NAME: 'app.js',
+    CSS_FILE_NAME: 'app.css',
+    DEBUG: true
+  };
+
+  /**
+   * Helper function for testing whether there is a script tag with the src
+   * value that was provided.
+   * @param src : The src value to check for.
+   **/
+  function hasJsFile(src) {
+    var scripts = document.getElementsByTagName('script');
+    var result = false;
+
+    for (var i = scripts.length - 1; i >= 0; i--) {
+      result = (result || scripts[i].getAttribute('src') === src);
+    };
+    return result;
+  }
+
+  /**
+   * Helper for checking whether there is a link tag with the provided href
+   * value.
+   **/
+  function hasCssFile(href) {
+    var links = document.getElementsByTagName('link');
+    var result = false;
+
+    for (var i = links.length - 1; i >= 0; i--) {
+      result = (result || links[i].getAttribute('href') === href);
+    };
+    return result;
+  }
 
   describe('setup', function() {
-
     bootstrap.setup(function() {}, function() {});
 
     it('should set successCallback', function() {
@@ -15,42 +52,88 @@ describe('Bootstrap', function() {
       expect(bootstrap).to.have.property('errorCallback');
       expect(bootstrap.errorCallback).to.be.a('function');
     });
-
   });
 
+  describe('init', function () {
+    var setupSpy = sinon.spy(readService, 'setup');
+    var readUrlsSpy = sinon.spy(readService, 'readUrls');
+    before(function () {
+      bootstrap.init('v_1.0.0');
+    });
+    it('should initialize', function () {
+      expect(setupSpy.called).to.be.true;
+      var setupArgs = setupSpy.getCall(0).args;
+      expect(setupArgs[0]).to.be.a('function');
+      expect(setupArgs[1]).to.be.a('function');
+
+      var expectedFiles = ['v_1.0.0_app.js', 'v_1.0.0_app.css'];
+      expect(readUrlsSpy.calledWith(expectedFiles)).to.be.true;
+    });
+  });
 
   describe('injectFile', function() {
 
     before(function () {
-      bootstrap.injectFile('my-app_v_1.1.1.js', 'JS');
+      bootstrap.injectFile(testJsFileName, 'JS');
     });
 
     it('should inject a JS file', function() {
-      var scripts = document.getElementsByTagName('script');
-      var result = false;
-
-      for (var i = scripts.length - 1; i >= 0; i--) {
-        result = (result || scripts[i].getAttribute('src') === 'my-app_v_1.1.1.js');
-      };
-
-      expect(result).to.be.true;
+      expect(hasJsFile(testJsFileName)).to.be.true;
     });
 
     before(function () {
-      bootstrap.injectFile('my-app_v_1.1.1.css', 'CSS');
+      bootstrap.injectFile(testCssFileName, 'CSS');
     });
 
     it('should inject a CSS file', function() {
-      var links = document.getElementsByTagName('link');
-      var result = false;
-
-      for (var i = links.length - 1; i >= 0; i--) {
-        result = (result || links[i].getAttribute('href') === 'my-app_v_1.1.1.css');
-      };
-
-      expect(result).to.be.true;
+      expect(hasCssFile(testCssFileName)).to.be.true;
     });
 
+    before(function () {
+      bootstrap.injectFile('invalid.js', null);
+    });
+
+    it('should not inject an unexpected file', function() {
+      expect(hasJsFile('invalid.js')).to.be.false;
+    });
+
+  });
+
+  describe('injectAllFiles', function () {
+    before(function () {
+      var files = [
+      {
+        fileEntry: {
+          nativeURL: '/test/test/' + testJsFileName
+        },
+        filename: testJsFileName,
+        read: true
+      },
+      {
+        fileEntry: {
+          nativeURL: '/test/test/' + testCssFileName
+        },
+        filename: testCssFileName,
+        read: true
+      }];
+      bootstrap._injectAllFiles(files);
+    });
+
+    it('should inject all files', function () {
+      expect(hasJsFile(testJsFileName)).to.be.true;
+      expect(hasCssFile(testCssFileName)).to.be.true;
+    });
+  });
+  describe('errorReadingFiles', function () {
+    var errorCallback = sinon.stub();
+
+    before(function() {
+      bootstrap.setup(function () {}, errorCallback);
+    });
+    it('should invoke the outer error handler', function () {
+      bootstrap._errorReadingFiles();
+      expect(errorCallback.called).to.be.true;
+    });
   });
 
 });
