@@ -6,20 +6,25 @@ var logger = require('./logger');
 –––––––––––––––––––––––––––––––––––––––––––––––––– */
 var downloadService = {};
 
+var downloadsQueue = [];
+var downloadedQueue = [];
+
 downloadService.setup = function(successCallback, errorCallback, versionToFetch) {
   this.versionToFetch = versionToFetch;
   this.successCallback = successCallback;
   this.errorCallback = errorCallback;
+
+  // Ensure these are empty at setup time - this acts as unit test cleanup.
+  downloadsQueue = [];
+  downloadedQueue = [];
+
   logger('version being fetched by download: ', versionToFetch);
 };
-
-var downloadsQueue = [];
-var downloadedQueue = [];
 
 downloadService.downloadUrls = function(urls) {
   if (typeof(urls) === 'string') {
     downloadsQueue.push(urls);
-  } else if (urls.constructor === Array) {
+  } else if (urls && urls.constructor === Array) {
     downloadsQueue = urls;
   } else {
     throw 'Url\'s must be String or Array';
@@ -56,10 +61,13 @@ function checkAllFilesDownloaded() {
 
 function downloadFile(url) {
   var filename = downloadService.versionToFetch + '_';
-  if (utils.isJsFile(url)) {
+  if (utils.hasFileExtension(url, 'js')) {
     filename = filename + constants.JS_FILE_NAME;
-  } else {
+  } else if (utils.hasFileExtension(url, 'css')) {
     filename = filename + constants.CSS_FILE_NAME;
+  } else {
+    // I don't think this should be able to occur.
+    downloadService.errorCallback('Encountered unexpected filetype', url);
   }
 
   function fileDownloadSuccess(data) {

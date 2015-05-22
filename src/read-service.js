@@ -4,19 +4,22 @@ var logger = require('./logger');
 –––––––––––––––––––––––––––––––––––––––––––––––––– */
 var readService = {};
 
+var readQueue = [];
+var loadedFiles = [];
+
 readService.setup = function(successCallback, errorCallback) {
   this.successCallback = successCallback;
   this.errorCallback = errorCallback;
+
+  // Ensure these are empty at setup time - this acts as unit test cleanup.
+  readQueue = [];
+  loadedFiles = [];
 };
-
-
-var readQueue = [];
-var loadedFiles = [];
 
 readService.readUrls = function(urls) {
   if (typeof(urls) === 'string') {
     readQueue.push(urls);
-  } else if (urls.constructor === Array) {
+  } else if (urls && urls.constructor === Array) {
     readQueue = urls;
   } else {
     throw 'Url\'s must be String or Array';
@@ -53,8 +56,7 @@ function checkAllFilesRead() {
 
 function readFile(filename) {
 
-  logger(cordova.file.dataDirectory);
-  logger(filename);
+  logger(cordova.file.dataDirectory, filename);
   window.resolveLocalFileSystemURL(cordova.file.dataDirectory + filename, readFileSuccess, readFileError);
 
   function readFileSuccess(fileEntry) {

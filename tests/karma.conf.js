@@ -17,8 +17,11 @@ module.exports = function(config) {
     coverageReporter: {
       type : 'lcov',
       reporters: [{
-        type: 'text-summary'
-      }]
+        type:'text-summary'
+      }, {
+        type:'html'
+      }],
+      dir : './coverage/'
     },
     colors: true,
     logLevel: config.LOG_ERROR,

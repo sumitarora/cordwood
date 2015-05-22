@@ -2,9 +2,10 @@ var constants = require('./constants');
 
 /* Logger
 –––––––––––––––––––––––––––––––––––––––––––––––––– */
-var logger = constants.DEBUG ?
-  function () { console.info.apply(this, arguments); }
-  : function() { };
-
+var logger = function() {
+  if (constants.DEBUG) {
+    console.info.apply(this, arguments);
+  }
+};
 
 module.exports = logger;

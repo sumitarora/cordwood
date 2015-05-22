@@ -23,36 +23,35 @@ bootstrap.init = function(version) {
 };
 
 bootstrap.injectFile = function(filename, filetype) {
-  // Create script tag for JS file
   if (filetype === 'JS') {
-
+    // Create script tag for JS file
     var fileref = document.createElement('script')
     fileref.setAttribute('type', 'text/javascript')
     fileref.setAttribute('src', filename)
-
   } else if (filetype === 'CSS') {
-
     // Create stylesheet tag for CSS file
     var fileref = document.createElement('link')
     fileref.setAttribute('rel', 'stylesheet')
     fileref.setAttribute('type', 'text/css')
     fileref.setAttribute('href', filename)
-
+  } else {
+    // It shouldn't be the case that something that is neither JS or CSS
+    // happens, but if it does, skip out, since there's nothing to add to the
+    // DOM.
+    return;
   }
 
   // Attach the tag to the head
-  if (typeof fileref !== 'undefined') {
-    document.getElementsByTagName('head')[0].appendChild(fileref);
-  }
+  document.getElementsByTagName('head')[0].appendChild(fileref);
 };
 
 function injectAllFiles(files) {
   logger('files', files);
   for (var i = 0; i < files.length; i++) {
     var fileEntry = files[i].fileEntry;
-    if (utils.isJsFile(fileEntry.nativeURL)) {
+    if (utils.hasFileExtension(fileEntry.nativeURL, 'js')) {
       bootstrap.injectFile(fileEntry.nativeURL, 'JS');
-    } else {
+    } else if (utils.hasFileExtension(fileEntry.nativeURL, 'css')) {
       bootstrap.injectFile(fileEntry.nativeURL, 'CSS');
     }
   }
@@ -65,5 +64,7 @@ function errorReadingFiles(error) {
   bootstrap.errorCallback();
 };
 
-
+// Expose these methods for unit testing.
+bootstrap._injectAllFiles = injectAllFiles;
+bootstrap._errorReadingFiles = errorReadingFiles;
 module.exports = bootstrap;
