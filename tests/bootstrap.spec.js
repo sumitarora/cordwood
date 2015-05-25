@@ -56,7 +56,7 @@ describe('Bootstrap', function() {
 
   describe('init', function () {
     var setupSpy = sinon.spy(readService, 'setup');
-    var readUrlsSpy = sinon.spy(readService, 'readUrls');
+    var readFilesSpy = sinon.spy(readService, 'readFiles');
     before(function () {
       bootstrap.init('v_1.0.0');
     });
@@ -67,14 +67,14 @@ describe('Bootstrap', function() {
       expect(setupArgs[1]).to.be.a('function');
 
       var expectedFiles = ['v_1.0.0_app.js', 'v_1.0.0_app.css'];
-      expect(readUrlsSpy.calledWith(expectedFiles)).to.be.true;
+      expect(readFilesSpy.calledWith(expectedFiles)).to.be.true;
     });
   });
 
   describe('injectFile', function() {
 
     before(function () {
-      bootstrap.injectFile(testJsFileName, 'JS');
+      bootstrap.injectFile(testJsFileName);
     });
 
     it('should inject a JS file', function() {
@@ -82,7 +82,7 @@ describe('Bootstrap', function() {
     });
 
     before(function () {
-      bootstrap.injectFile(testCssFileName, 'CSS');
+      bootstrap.injectFile(testCssFileName);
     });
 
     it('should inject a CSS file', function() {
@@ -90,11 +90,11 @@ describe('Bootstrap', function() {
     });
 
     before(function () {
-      bootstrap.injectFile('invalid.js', null);
+      bootstrap.injectFile('invalid.js.temp');
     });
 
     it('should not inject an unexpected file', function() {
-      expect(hasJsFile('invalid.js')).to.be.false;
+      expect(hasJsFile('invalid.js.temp')).to.be.false;
     });
 
   });

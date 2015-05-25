@@ -7,14 +7,14 @@ var downloadService = require('./download-service');
 –––––––––––––––––––––––––––––––––––––––––––––––––– */
 function Cordwood(options) {
   var versionUrl = options.versionUrl;
-  var files = [options.javascriptUrl, options.cssUrl];
+  var urls = [options.javascriptUrl, options.cssUrl];
   var currentVersion = options.currentVersion;
   var successCallback = options.successCallback;
   var errorCallback = options.errorCallback;
 
   (function setup() {
 
-    // Setup the callbacks for bootstrapping
+    // Setup the callbacks for bootstrapping the app
     bootstrap.setup(successCallback, errorCallback);
     // If a current version is not available
     if (version.getCurrent() === undefined) {
@@ -25,7 +25,7 @@ function Cordwood(options) {
     version.fetchLatestVersion(versionUrl, function() {
       if (version.didUpdate()) {
         logger('version changed calling api to download files');
-        downloadUpdatedApp(files, version.getUpdated());
+        downloadUpdatedApp(urls, version.getUpdated());
       } else {
         logger('version did not change loading version: %s', version.getCurrent());
         bootstrap.init(version.getCurrent());
@@ -33,13 +33,21 @@ function Cordwood(options) {
     });
   })();
 
-
-  function downloadUpdatedApp(files, version) {
+  /**
+   * Download the specified JS/CSS urls as the specified version of the app.
+   * @param urls : The URLs for the JavaScript and CSS for the application
+   * @param version : A version number.
+   **/
+  function downloadUpdatedApp(urls, version) {
     logger('new version is %s', version);
     downloadService.setup(allFilesDownloaded, errorWhileDownloading, version);
-    downloadService.downloadUrls(files);
+    downloadService.downloadUrls(urls);
   };
 
+  /**
+   * Callback for once all of the files have been downloaded. Uses the bootstrap
+   * to add the files to the DOM.
+   **/
   function allFilesDownloaded(files) {
     version.setCurrent(version.getUpdated())
     bootstrap.init(version.getCurrent());
