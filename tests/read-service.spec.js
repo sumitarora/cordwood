@@ -22,7 +22,7 @@ describe('Read Service', function() {
   });
 
 
-  describe('readUrls', function() {
+  describe('readFiles', function() {
     var successCallback = sinon.stub();
     var errorCallback = sinon.stub();
 
@@ -33,7 +33,7 @@ describe('Read Service', function() {
     });
 
     it('should read a single string URL', function() {
-      expect(function () { readService.readUrls(stringUrl); })
+      expect(function () { readService.readFiles(stringUrl); })
         .to.not.throw(Error);
       expect(successCallback.called).to.be.true;
 
@@ -42,7 +42,7 @@ describe('Read Service', function() {
     });
 
     it('should read multiple URLs passed in as an array', function() {
-      expect(function () { readService.readUrls(urlArray); })
+      expect(function () { readService.readFiles(urlArray); })
         .to.not.throw(Error);
       expect(successCallback.called).to.be.true;
 
@@ -52,14 +52,14 @@ describe('Read Service', function() {
     });
 
     it('should fail if object or function passed in as URLs', function() {
-      expect(function () { readService.readUrls({}); })
-        .to.throw('Url\'s must be String or Array');
+      expect(function () { readService.readFiles({}); })
+        .to.throw('File name\'s must be String or Array');
 
-      expect(function () { readService.readUrls(function() {}) })
-        .to.throw('Url\'s must be String or Array');
+      expect(function () { readService.readFiles(function() {}) })
+        .to.throw('File name\'s must be String or Array');
 
-      expect(function () { readService.readUrls() })
-        .to.throw('Url\'s must be String or Array');
+      expect(function () { readService.readFiles() })
+        .to.throw('File name\'s must be String or Array');
 
     });
 
@@ -71,7 +71,7 @@ describe('Read Service', function() {
         eCB();
       };
 
-      readService.readUrls(urlArray);
+      readService.readFiles(urlArray);
 
       expect(errorCallback.calledWith('Unable to read all files')).to.be.true;
 

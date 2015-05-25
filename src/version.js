@@ -6,6 +6,15 @@ var logger = require('./logger');
 –––––––––––––––––––––––––––––––––––––––––––––––––– */
 var version = {};
 
+/**
+ * Retrieve the version of code to use from the specified URL.
+ * This will set the updated version. If successful, using the version that was
+ * retrieved; and if there was a problem, using the version that is currently
+ * being used.
+ * The callback will be called for both success and failure outcomes.
+ * @param versionUrl : The URL where the version can be retrieved.
+ * @param callback : The callback for when the version request completes.
+ **/
 version.fetchLatestVersion = function(versionUrl, callback) {
   logger('fetching new version from %s', versionUrl);
 
@@ -39,22 +48,30 @@ version.fetchLatestVersion = function(versionUrl, callback) {
   return xhr;
 };
 
+/**
+ * Helper for checking whether the version as requested from the server matches
+ * the current version of the code.
+ **/
 version.didUpdate = function() {
   return version.getUpdated() !== version.getCurrent();
 };
 
+/**
+ * Getter/setter for the version of the code currently installed.
+ **/
 version.setCurrent = function(value) {
   localStorage.CURRENT_VERSION = value;
 };
-
 version.getCurrent = function() {
   return localStorage.CURRENT_VERSION;
 };
 
+/**
+ * Getter/setter for the version of the code reported by the version URL.
+ **/
 version.setUpdated = function(value) {
   version.updated = value;
 };
-
 version.getUpdated = function() {
   return version.updated;
 };
