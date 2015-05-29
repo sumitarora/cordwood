@@ -1,3 +1,4 @@
+'use strict';
 var constants = require('./constants');
 
 /* URLs
@@ -8,16 +9,15 @@ var urls = {};
  * Set the base URL
  * @param baseUrl
  */
-urls.setBase = function(baseUrl) {
+urls.setBase = function (baseUrl) {
   urls.base = baseUrl;
 };
 
 /**
  * Set the base URL and generate the various URLs required for
  * the master branch.
- * @param baseUrl
  */
-urls.initForMaster = function() {
+urls.initForMaster = function () {
   var masterUrl = urls.base + constants.MASTER_PATH + '/';
 
   urls.files = [
@@ -34,7 +34,7 @@ urls.initForMaster = function() {
  * the PR branch.
  * @param path
  */
-urls.initForPr = function(path) {
+urls.initForPr = function (path) {
 
   var prUrl = urls.base + (path || constants.MASTER_PATH) + '/';
 

@@ -1,3 +1,4 @@
+'use strict';
 var logger = require('./logger');
 
 /* Read Service
@@ -10,7 +11,7 @@ var loadedFiles = [];
 /**
  * Initialize the read service with the callback functions from the bootstrap.
  **/
-readService.setup = function(successCallback, errorCallback) {
+readService.setup = function (successCallback, errorCallback) {
   this.successCallback = successCallback;
   this.errorCallback = errorCallback;
 
@@ -21,11 +22,11 @@ readService.setup = function(successCallback, errorCallback) {
 
 /**
  * Entry point for reading a set of files from the data directory.
- * @param filenames : The filenames to read. This can be either a string with
+ * @param filenames The filenames to read. This can be either a string with
  * one filename, or an array with multiple file names.
  **/
-readService.readFiles = function(filenames) {
-  if (typeof(filenames) === 'string') {
+readService.readFiles = function (filenames) {
+  if (typeof filenames === 'string') {
     readQueue.push(filenames);
   } else if (filenames && filenames.constructor === Array) {
     readQueue = filenames;
@@ -44,8 +45,8 @@ function startReading() {
   logger('start reading');
   for (var i = 0; i < readQueue.length; i++) {
     readFile(readQueue[i]);
-  };
-};
+  }
+}
 
 /**
  * Helper for establishing which callback function should be called once all of
@@ -53,21 +54,21 @@ function startReading() {
  **/
 function checkAllFilesRead() {
   logger('check', loadedFiles);
-  if (readQueue.length == loadedFiles.length) {
+  if (readQueue.length === loadedFiles.length) {
     var allRead = true;
     for (var i = 0; i < loadedFiles.length; i++) {
       if (!loadedFiles[i].read) {
         allRead = false;
         break;
       }
-    };
+    }
     if (allRead) {
       readService.successCallback(loadedFiles);
     } else {
       readService.errorCallback('Unable to read all files');
     }
   }
-};
+}
 
 /**
  * Attempt to read the provided filename from the cordova data directory.
@@ -94,7 +95,7 @@ function readFile(filename) {
       read: true
     });
     checkAllFilesRead();
-  };
+  }
 
   function readFileError(e) {
     logger(e);
@@ -103,7 +104,7 @@ function readFile(filename) {
       read: false
     });
     checkAllFilesRead();
-  };
-};
+  }
+}
 
 module.exports = readService;

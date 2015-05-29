@@ -1,3 +1,4 @@
+'use strict';
 var constants = require('./constants');
 var utils = require('./utils');
 var logger = require('./logger');
@@ -12,7 +13,8 @@ var downloadedQueue = [];
 /**
  * Initialize the download service with the callbacks defined in cordwood.js
  **/
-downloadService.setup = function(successCallback, errorCallback, versionToFetch) {
+downloadService.setup = function (successCallback, errorCallback,
+  versionToFetch) {
   this.versionToFetch = versionToFetch;
   this.successCallback = successCallback;
   this.errorCallback = errorCallback;
@@ -29,8 +31,8 @@ downloadService.setup = function(successCallback, errorCallback, versionToFetch)
  * @param urls - The URLs to retrieve. This can be either a string with one URL,
  * or an array with multiple filenames.
  **/
-downloadService.downloadUrls = function(urls) {
-  if (typeof(urls) === 'string') {
+downloadService.downloadUrls = function (urls) {
+  if (typeof urls === 'string') {
     downloadsQueue.push(urls);
   } else if (urls && urls.constructor === Array) {
     downloadsQueue = urls;
@@ -49,8 +51,8 @@ function startDownload() {
   logger('start download');
   for (var i = 0; i < downloadsQueue.length; i++) {
     downloadFile(downloadsQueue[i]);
-  };
-};
+  }
+}
 
 /**
  * Helper for establishing which callback function should be called once all of
@@ -58,21 +60,21 @@ function startDownload() {
  **/
 function checkAllFilesDownloaded() {
   logger('check', downloadedQueue);
-  if (downloadedQueue.length == downloadsQueue.length) {
+  if (downloadedQueue.length === downloadsQueue.length) {
     var allDownloded = true;
     for (var i = 0; i < downloadedQueue.length; i++) {
       if (!downloadedQueue[i].downloaded) {
         allDownloded = false;
         break;
       }
-    };
+    }
     if (allDownloded) {
       downloadService.successCallback(downloadedQueue);
     } else {
       downloadService.errorCallback('Unable to download all files');
     }
   }
-};
+}
 
 /**
  * Helper for taking an URL, downloading it, and writing its contents to the
@@ -101,7 +103,7 @@ function downloadFile(url) {
       downloaded: true
     });
     checkAllFilesDownloaded();
-  };
+  }
 
   function fileDownloadError(error) {
     logger(error);
@@ -110,14 +112,13 @@ function downloadFile(url) {
       downloaded: false
     });
     checkAllFilesDownloaded();
-  };
+  }
 
   window.resolveLocalFileSystemURL(
     cordova.file.dataDirectory,
-    function(directory) {
+    function (directory) {
       directory.getFile(
-        filename,
-        {
+        filename, {
           create: true,
           exclusive: false
         },
@@ -141,7 +142,7 @@ function downloadFile(url) {
       );
     },
     fileDownloadError);
-};
+}
 
 
 module.exports = downloadService;
