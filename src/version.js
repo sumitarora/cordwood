@@ -1,5 +1,4 @@
-var downloadService = require('./download-service');
-var bootstrap = require('./bootstrap');
+'use strict';
 var logger = require('./logger');
 
 /* Version Check
@@ -14,26 +13,28 @@ var version = {};
  * request completes.
  * @param errorCallback : The callback for when the version request fails.
  */
-version.fetchAllVersions = function(url, successCallback, errorCallback) {
+version.fetchAllVersions = function (url, successCallback, errorCallback) {
   logger('fetching all available versions from %s', url);
 
   var xhr = new XMLHttpRequest();
-  xhr.open('GET', (url + '?' + (new Date()).getTime()), true);
+  xhr.open('GET', (url + '?' + new Date().getTime()), true);
   xhr.responseType = 'json';
   xhr.timeout = 4000;
 
-  xhr.ontimeout = function() {
+  xhr.ontimeout = function () {
     logger('unable to get all versions; Timed out');
     errorCallback();
   };
 
-  xhr.onerror = function(e) {
+  xhr.onerror = function (e) {
     logger('unable to get all versions', e);
     errorCallback();
   };
 
-  xhr.onreadystatechange = function(e) {
+  xhr.onreadystatechange = function () {
+    /*eslint-disable eqeqeq */
     if (this.readyState == 4 && this.status == 200) {
+      /*eslint-enable eqeqeq */
       successCallback(this.response.prs);
     }
   };
@@ -53,28 +54,30 @@ version.fetchAllVersions = function(url, successCallback, errorCallback) {
  * @param versionUrl : The URL where the version can be retrieved.
  * @param callback : The callback for when the version request completes.
  **/
-version.fetchLatestVersion = function(url, callback) {
+version.fetchLatestVersion = function (url, callback) {
   logger('fetching new version from %s', url);
 
   var xhr = new XMLHttpRequest();
-  xhr.open('GET', (url + '?' + (new Date()).getTime()), true);
+  xhr.open('GET', (url + '?' + new Date().getTime()), true);
   xhr.responseType = 'json';
   xhr.timeout = 4000;
 
-  xhr.ontimeout = function() {
+  xhr.ontimeout = function () {
     logger('unable to check version Timed out');
     callback();
     version.setUpdated(version.getCurrent());
   };
 
-  xhr.onerror = function(e) {
+  xhr.onerror = function (e) {
     logger('unable to check version', e);
     callback();
     version.setUpdated(version.getCurrent());
   };
 
-  xhr.onreadystatechange = function(e) {
+  xhr.onreadystatechange = function () {
+    /*eslint-disable eqeqeq */
     if (this.readyState == 4 && this.status == 200) {
+      /*eslint-enable eqeqeq */
       version.setUpdated(this.response.version);
       callback();
     }
@@ -90,27 +93,27 @@ version.fetchLatestVersion = function(url, callback) {
  * Helper for checking whether the version as requested from the server matches
  * the current version of the code.
  **/
-version.didUpdate = function() {
+version.didUpdate = function () {
   return version.getUpdated() !== version.getCurrent();
 };
 
 /**
  * Getter/setter for the version of the code currently installed.
  **/
-version.setCurrent = function(value) {
+version.setCurrent = function (value) {
   localStorage.CURRENT_VERSION = value;
 };
-version.getCurrent = function() {
+version.getCurrent = function () {
   return localStorage.CURRENT_VERSION;
 };
 
 /**
  * Getter/setter for the version of the code reported by the version URL.
  **/
-version.setUpdated = function(value) {
+version.setUpdated = function (value) {
   version.updated = value;
 };
-version.getUpdated = function() {
+version.getUpdated = function () {
   return version.updated;
 };
 

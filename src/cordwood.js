@@ -1,3 +1,4 @@
+'use strict';
 var bootstrap = require('./bootstrap');
 var downloadService = require('./download-service');
 var logger = require('./logger');
@@ -26,9 +27,10 @@ function Cordwood(options) {
 
     if (multipleVersions) {
       // Fetch all available versions
-      version.fetchAllVersions(urls.allVersions, onFetchAllVersions, function(url) {
+      version.fetchAllVersions(urls.allVersions, onFetchAllVersions, function () {
         // If Fetch all versions fails then default to refreshing master
-        version.fetchLatestVersion(urls.latestVersion, onFetchLatestVersion);
+        version.fetchLatestVersion(urls.latestVersion,
+          onFetchLatestVersion);
       });
     } else {
       // Fetch the latest version number and respond accordingly
@@ -38,23 +40,23 @@ function Cordwood(options) {
 
   /**
    * Download the specified JS/CSS urls as the specified version of the app.
-   * @param urls : The URLs for the JavaScript and CSS for the application
-   * @param version : A version number.
+   * @param _urls The URLs for the JavaScript and CSS for the application
+   * @param _version A version number.
    **/
-  function downloadUpdatedApp(urls, version) {
-    logger('new version is %s', version);
-    downloadService.setup(allFilesDownloaded, errorWhileDownloading, version);
-    downloadService.downloadUrls(urls);
-  };
+  function downloadUpdatedApp(_urls, _version) {
+    logger('new _version is %s', _version);
+    downloadService.setup(allFilesDownloaded, errorWhileDownloading, _version);
+    downloadService.downloadUrls(_urls);
+  }
 
   /**
    * Callback for once all of the files have been downloaded.
    * Uses the bootstrap to add the files to the DOM.
    **/
-  function allFilesDownloaded(files) {
-    version.setCurrent(version.getUpdated())
+  function allFilesDownloaded() {
+    version.setCurrent(version.getUpdated());
     bootstrap.init(version.getCurrent());
-  };
+  }
 
   /**
    * Error callback for when file download fails.
@@ -62,7 +64,7 @@ function Cordwood(options) {
   function errorWhileDownloading(error) {
     logger(error);
     bootstrap.init(version.getCurrent());
-  };
+  }
 
   /**
    * This function checks to see if the version updated or not.
@@ -77,17 +79,17 @@ function Cordwood(options) {
       logger('version did not change loading version: %s', version.getCurrent());
       bootstrap.init(version.getCurrent());
     }
-  };
+  }
 
   /**
    * Success callback for fetching all versions.
    */
   function onFetchAllVersions(versions) {
-    ui.init(versions, function(url) {
+    ui.init(versions, function (url) {
       ui.teardown();
       version.fetchLatestVersion(url, onFetchLatestVersion);
     });
-  };
-};
+  }
+}
 
 window.Cordwood = Cordwood;

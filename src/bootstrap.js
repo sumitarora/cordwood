@@ -1,3 +1,4 @@
+'use strict';
 var readService = require('./read-service');
 var constants = require('./constants');
 var utils = require('./utils');
@@ -15,7 +16,7 @@ var bootstrap = {};
  * @param errorCallback : The callback used if initialization fails. Probably,
  * this would show an error page.
  **/
-bootstrap.setup = function(successCallback, errorCallback) {
+bootstrap.setup = function (successCallback, errorCallback) {
   this.successCallback = successCallback;
   this.errorCallback = errorCallback;
 };
@@ -25,7 +26,7 @@ bootstrap.setup = function(successCallback, errorCallback) {
  * into the DOM.
  * @param version : The version of the app to load.
  **/
-bootstrap.init = function(version) {
+bootstrap.init = function (version) {
   var files = [
     version + '_' + constants.JS_FILE_NAME,
     version + '_' + constants.CSS_FILE_NAME
@@ -40,18 +41,18 @@ bootstrap.init = function(version) {
  * node for that resource to the head of the document.
  * @param url : The native URL for a js or css file to be included in the document.
  **/
-bootstrap.injectFile = function(url) {
+bootstrap.injectFile = function (url) {
   if (utils.hasFileExtension(url, 'js')) {
     // Create script tag for JS file
-    var fileref = document.createElement('script')
-    fileref.setAttribute('type', 'text/javascript')
-    fileref.setAttribute('src', url)
+    var fileref = document.createElement('script');
+    fileref.setAttribute('type', 'text/javascript');
+    fileref.setAttribute('src', url);
   } else if (utils.hasFileExtension(url, 'css')) {
     // Create stylesheet tag for CSS file
-    var fileref = document.createElement('link')
-    fileref.setAttribute('rel', 'stylesheet')
-    fileref.setAttribute('type', 'text/css')
-    fileref.setAttribute('href', url)
+    fileref = document.createElement('link');
+    fileref.setAttribute('rel', 'stylesheet');
+    fileref.setAttribute('type', 'text/css');
+    fileref.setAttribute('href', url);
   } else {
     // It shouldn't be the case that something that is neither JS or CSS
     // happens, but if it does, skip out, since there's nothing to add to the
@@ -78,7 +79,7 @@ function injectAllFiles(files) {
   }
 
   setTimeout(bootstrap.successCallback, 500);
-};
+}
 
 /**
  * The callback used by the read service if there was a problem reading the
@@ -87,7 +88,7 @@ function injectAllFiles(files) {
 function errorReadingFiles(error) {
   logger(error);
   bootstrap.errorCallback();
-};
+}
 
 // Expose these methods for unit testing.
 bootstrap._injectAllFiles = injectAllFiles;

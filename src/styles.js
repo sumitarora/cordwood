@@ -1,3 +1,4 @@
+'use strict';
 var utils = require('./utils');
 
 /* Styles
@@ -53,33 +54,30 @@ styles.jsonCSS = {
 // the type passed in is used as the selector
 // eg: if type is a:hover, a:list
 // the final result will be: a:hover, a:list { … }
-styles.getByType = function(type) {
-  if (type === 'get' || !(type in styles.jsonCSS)) {
-    return;
+styles.getByType = function (type) {
+  if (type !== 'get' && type in styles.jsonCSS) {
+    var styleObj = styles.jsonCSS[type];
+    var styleStr = type + ' { ';
+
+    var keys = Object.keys(styleObj);
+
+    for (var i = 0; i < keys.length; i++) {
+      styleStr += utils.toSnakeCase(keys[i]) + ': ' +
+        String(styleObj[keys[i]]) + '; ';
+    }
+    return styleStr + '}';
   }
-
-  var styleObj = styles.jsonCSS[type];
-  var styleStr = type + ' { ';
-
-  var keys = Object.keys(styleObj);
-
-  for (var i = 0; i < keys.length; i++) {
-    styleStr += utils.toSnakeCase(keys[i]) + ': ' +
-                String(styleObj[keys[i]]) + '; ';
-  };
-
-  return styleStr + '}';
 };
 
 // Generates a CSS string that can be used in a
 // stylesheet or a style tag
-styles.get = function() {
+styles.get = function () {
   var keys = Object.keys(styles.jsonCSS);
   var cssString = '';
 
   for (var i = 0; i < keys.length; i++) {
     cssString += styles.getByType(keys[i]) + ' ';
-  };
+  }
 
   return cssString;
 };

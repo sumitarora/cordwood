@@ -5,6 +5,10 @@ var rename = require('gulp-rename');
 var browserify = require('gulp-browserify');
 var karma = require('karma').server;
 var mocha = require('mocha');
+var eslint = require('gulp-eslint');
+var beautify = require('gulp-jsbeautifier');
+
+var srcFiles = ['./src/*.js'];
 
 // Build browserify package
 gulp.task('scripts', function() {
@@ -25,9 +29,21 @@ gulp.task('scripts', function() {
           .pipe(gulp.dest('./example/www'));
 });
 
+gulp.task('lint', function() {
+  return gulp.src(srcFiles)
+    .pipe(eslint())
+    .pipe(eslint.format())
+    .pipe(eslint.failOnError())});
+
+
+gulp.task('beautify', function() {
+  return gulp.src(srcFiles, { base: '.' })
+    .pipe(beautify({ config: '.jsbeautifyrc' }))
+    .pipe(gulp.dest('.'));
+});
 
 // Testing
-gulp.task('test', function (done) {
+gulp.task('test', ['lint'], function (done) {
   karma.start({
     configFile: __dirname + '/tests/karma.conf.js',
     singleRun: true
