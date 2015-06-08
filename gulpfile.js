@@ -9,6 +9,7 @@ var eslint = require('gulp-eslint');
 var beautify = require('gulp-jsbeautifier');
 
 var srcFiles = ['./src/*.js'];
+var testFiles = ['./tests/**/*.js'];
 
 // Build browserify package
 gulp.task('scripts', function() {
@@ -38,12 +39,13 @@ gulp.task('lint', function() {
 
 gulp.task('beautify', function() {
   return gulp.src(srcFiles, { base: '.' })
+    .pipe(gulp.src(testFiles, { base: '.' }))
     .pipe(beautify({ config: '.jsbeautifyrc' }))
     .pipe(gulp.dest('.'));
 });
 
 // Testing
-gulp.task('test', ['lint'], function (done) {
+gulp.task('test', [], function (done) {
   karma.start({
     configFile: __dirname + '/tests/karma.conf.js',
     singleRun: true

@@ -1,4 +1,5 @@
-module.exports = function(config) {
+'use strict';
+module.exports = function (config) {
   config.set({
     basePath: '../',
     frameworks: ['browserify', 'mocha', 'chai', 'sinon'],
@@ -7,7 +8,11 @@ module.exports = function(config) {
       'tests/**/*.spec.js'
     ],
     preprocessors: {
-      'tests/**/*.spec.js': ['browserify']
+      'tests/**/*.spec.js': ['browserify', 'wrap'],
+      'tests/mocks/*.mock.js': ['wrap']
+    },
+    wrapPreprocessor: {
+      template: '(function () { <%= contents %> })()'
     },
     browserify: {
       debug: true,
@@ -15,13 +20,13 @@ module.exports = function(config) {
     },
     reporters: ['coverage', 'mocha'],
     coverageReporter: {
-      type : 'lcov',
+      type: 'lcov',
       reporters: [{
-        type:'text-summary'
+        type: 'text-summary'
       }, {
-        type:'html'
+        type: 'html'
       }],
-      dir : './coverage/'
+      dir: './coverage/'
     },
     colors: true,
     logLevel: config.LOG_ERROR,

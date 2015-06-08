@@ -1,7 +1,7 @@
 var bootstrap = require('../src/bootstrap');
 var readService = require('../src/read-service');
 
-describe('Bootstrap', function() {
+describe('Bootstrap', function () {
   var testJsFileName = 'my-app_v_1.1.1.js';
   var testCssFileName = 'my-app_v_1.1.1.css';
 
@@ -40,15 +40,15 @@ describe('Bootstrap', function() {
     return result;
   }
 
-  describe('setup', function() {
-    bootstrap.setup(function() {}, function() {});
+  describe('setup', function () {
+    bootstrap.setup(function () {}, function () {});
 
-    it('should set successCallback', function() {
+    it('should set successCallback', function () {
       expect(bootstrap).to.have.property('successCallback');
       expect(bootstrap.successCallback).to.be.a('function');
     });
 
-    it('should set errorCallback', function() {
+    it('should set errorCallback', function () {
       expect(bootstrap).to.have.property('errorCallback');
       expect(bootstrap.errorCallback).to.be.a('function');
     });
@@ -66,18 +66,21 @@ describe('Bootstrap', function() {
       expect(setupArgs[0]).to.be.a('function');
       expect(setupArgs[1]).to.be.a('function');
 
-      var expectedFiles = ['v_1.0.0_app.js', 'v_1.0.0_app.css'];
+      // TODO move those out. Wrong test
+      var expectedFiles = ['v_1.0.0_app.js',
+        'www/css/v_1.0.0_app.css'
+      ];
       expect(readFilesSpy.calledWith(expectedFiles)).to.be.true;
     });
   });
 
-  describe('injectFile', function() {
+  describe('injectFile', function () {
 
     before(function () {
       bootstrap.injectFile(testJsFileName);
     });
 
-    it('should inject a JS file', function() {
+    it('should inject a JS file', function () {
       expect(hasJsFile(testJsFileName)).to.be.true;
     });
 
@@ -85,7 +88,7 @@ describe('Bootstrap', function() {
       bootstrap.injectFile(testCssFileName);
     });
 
-    it('should inject a CSS file', function() {
+    it('should inject a CSS file', function () {
       expect(hasCssFile(testCssFileName)).to.be.true;
     });
 
@@ -93,7 +96,7 @@ describe('Bootstrap', function() {
       bootstrap.injectFile('invalid.js.temp');
     });
 
-    it('should not inject an unexpected file', function() {
+    it('should not inject an unexpected file', function () {
       expect(hasJsFile('invalid.js.temp')).to.be.false;
     });
 
@@ -101,15 +104,13 @@ describe('Bootstrap', function() {
 
   describe('injectAllFiles', function () {
     before(function () {
-      var files = [
-      {
+      var files = [{
         fileEntry: {
           nativeURL: '/test/test/' + testJsFileName
         },
         filename: testJsFileName,
         read: true
-      },
-      {
+      }, {
         fileEntry: {
           nativeURL: '/test/test/' + testCssFileName
         },
@@ -127,7 +128,7 @@ describe('Bootstrap', function() {
   describe('errorReadingFiles', function () {
     var errorCallback = sinon.stub();
 
-    before(function() {
+    before(function () {
       bootstrap.setup(function () {}, errorCallback);
     });
     it('should invoke the outer error handler', function () {

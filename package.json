@@ -38,7 +38,8 @@
     "mocha": "^2.2.4",
     "sinon": "^1.14.1",
     "gulp-eslint": "^0.12.0",
-    "gulp-jsbeautifier": "0.0.8"
+    "gulp-jsbeautifier": "0.0.8",
+    "karma-wrap-preprocessor": "^0.1.0"
   },
   "dependencies": {
   }

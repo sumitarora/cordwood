@@ -9,7 +9,7 @@ var constants = require('./constants');
  **/
 var logger = function () {
   if (constants.DEBUG) {
-    console.info.apply(this, arguments);
+    console.info.apply(console, arguments);
   }
 };
 
