@@ -1,7 +1,9 @@
 'use strict';
 /* Asset Service
 –––––––––––––––––––––––––––––––––––––––––––––––––– */
-var assetService = {'setup': setup};
+var assetService = {
+  'setup': setup
+};
 
 var constants = require('./constants');
 
@@ -123,24 +125,24 @@ function makeChildGetter(dirEntry) {
  */
 function copyDirectory(src, dest) {
   logger(['copying directory', src, 'into', dest].join(' '));
-    src.createReader().readEntries(function (entries) {
-      makeIterator(function (entry) {
-        var name = entry.name;
-        logger('name: ' + name);
-        if (entry.isFile === true) {
-          dest.getFile(name, {
-            'create': true
-          }, makeEntryCopierFn(entry));
-        } else if (entry.isDirectory === true) {
-          dest.getDirectory(name, {
-            'create': true
-          }, makeEntryCopierFn(entry));
-        } else {
-          throw new Error('Neither file nor directory');
-        }
-        makeChildGetter(dest)(name, makeEntryCopierFn(entry));
-      })(entries);
-    }, makeErrorThrower(src, dest));
+  src.createReader().readEntries(function (entries) {
+    makeIterator(function (entry) {
+      var name = entry.name;
+      logger('name: ' + name);
+      if (entry.isFile === true) {
+        dest.getFile(name, {
+          'create': true
+        }, makeEntryCopierFn(entry));
+      } else if (entry.isDirectory === true) {
+        dest.getDirectory(name, {
+          'create': true
+        }, makeEntryCopierFn(entry));
+      } else {
+        throw new Error('Neither file nor directory');
+      }
+      makeChildGetter(dest)(name, makeEntryCopierFn(entry));
+    })(entries);
+  }, makeErrorThrower(src, dest));
 }
 
 /**

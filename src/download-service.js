@@ -133,7 +133,6 @@ function downloadFile(url) {
         function gotFileEntry(fileEntry) {
           var fileTransfer = new FileTransfer();
           fileEntry.remove();
-          console.log(fileEntry.nativeURL);
           fileTransfer.download(
             url,
             fileEntry.nativeURL,
