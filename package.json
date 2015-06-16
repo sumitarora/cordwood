@@ -1,6 +1,6 @@
 {
   "name": "cordwood",
-  "version": "1.0.0",
+  "version": "0.1.1",
   "description": "cordwood",
   "main": "dist/cordwood.js",
   "scripts": {

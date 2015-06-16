@@ -89,7 +89,10 @@ function setup(src, dest) {
   resolveLocalFileSystemURL(destinationDirectory, function (dataDirectory) {
     makeDirectoryCreator(dataDirectory)(constants.CSS_DIRECTORY);
   });
-  copyAssets();
+  if (localStorage.hasAssetServiceRun !== 'true') {
+    localStorage.hasAssetServiceRun = 'true';
+    copyAssets();
+  }
 }
 
 /**
